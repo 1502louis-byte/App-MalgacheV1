@@ -1,0 +1,16 @@
+{
+  "name": "Apprendre le Malgache",
+  "short_name": "Malgache",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0F1117",
+  "theme_color": "#0F1117",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
