@@ -3,8 +3,8 @@
   "short_name": "Malgache",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0F1117",
-  "theme_color": "#0F1117",
+  "background_color": "#F5F5F7",
+  "theme_color": "#007AFF",
   "orientation": "portrait-primary",
   "icons": [
     {
