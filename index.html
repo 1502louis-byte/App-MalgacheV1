@@ -1,43 +1,1576 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="light">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Malgache">
-  <meta name="theme-color" content="#0F1117">
-  
-  <title>Apprendre le Malgache 🇲🇬</title>
-  
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Malgache">
+<meta name="theme-color" content="#6C63FF">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Apprendre le Malgache 🇲🇬</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0F1117; --surf: #1A1D27; --surf2: #22263A; --surf3: #2A2D3A;
+  --text: #E8EAF0; --muted: #8B91A8; --accent: #6C63FF;
+  --red: #FF6B6B; --teal: #4ECDC4; --yellow: #FFD93D; --green: #6BCB77;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; background: var(--bg); }
+body { font-family: 'Nunito', sans-serif; color: var(--text); display: flex; flex-direction: column; }
+
+/* LAYOUT */
+#app { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+.screen { flex: 1; overflow-y: auto; padding: 0 16px calc(80px + var(--safe-bot)); -webkit-overflow-scrolling: touch; }
+.screen::-webkit-scrollbar { display: none; }
+
+/* BOTTOM NAV */
+#nav { display: flex; background: var(--surf); border-top: 1px solid var(--surf3);
+  padding: 8px 0 calc(8px + var(--safe-bot)); flex-shrink: 0; }
+.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  background: none; border: none; color: var(--muted); cursor: pointer; font-family: inherit;
+  font-size: 10px; font-weight: 700; padding: 4px 0; transition: color .2s; }
+.nav-btn.active { color: var(--accent); }
+.nav-icon { font-size: 22px; }
+
+/* HEADER */
+.page-header { padding: calc(var(--safe-top) + 16px) 0 12px; position: sticky; top: 0;
+  background: var(--bg); z-index: 10; }
+.page-title { font-size: 22px; font-weight: 900; }
+.page-sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+/* HOME */
+.hero { background: linear-gradient(135deg, var(--surf) 0%, var(--surf2) 100%);
+  border-radius: 20px; padding: 20px; margin: calc(var(--safe-top) + 16px) 0 16px; }
+.hero-top { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.hero-flag { font-size: 44px; }
+.hero-title { font-size: 26px; font-weight: 900;
+  background: linear-gradient(90deg, var(--accent), var(--teal));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero-sub { color: var(--muted); font-size: 12px; }
+.stats-row { display: flex; gap: 10px; margin-bottom: 14px; }
+.stat { flex: 1; background: var(--surf3); border-radius: 12px; padding: 10px 6px;
+  text-align: center; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.stat-val { font-size: 18px; font-weight: 900; }
+.stat-lbl { color: var(--muted); font-size: 10px; }
+.xp-label { color: var(--muted); font-size: 11px; margin-bottom: 4px; }
+.xp-track { height: 8px; background: var(--surf3); border-radius: 4px; overflow: hidden; }
+.xp-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--teal));
+  border-radius: 4px; transition: width .5s; }
+
+.menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.menu-card { background: var(--surf); border: 1px solid var(--surf3); border-radius: 18px;
+  padding: 18px 14px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  cursor: pointer; text-align: left; font-family: inherit; color: var(--text);
+  transition: transform .15s, box-shadow .15s; position: relative; overflow: hidden; }
+.menu-card:active { transform: scale(.97); }
+.menu-card-icon { font-size: 30px; }
+.menu-card-title { font-size: 15px; font-weight: 800; }
+.menu-card-desc { color: var(--muted); font-size: 11px; }
+.menu-card-bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 18px 18px 0 0; }
+
+.tip-box { background: var(--surf); border-radius: 14px; padding: 14px;
+  display: flex; gap: 10px; align-items: flex-start; }
+.tip-text { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+/* CARDS & LISTS */
+.theme-list { display: flex; flex-direction: column; gap: 10px; }
+.theme-card { background: var(--surf); border: 1px solid var(--surf3); border-radius: 14px;
+  padding: 14px 16px; display: flex; align-items: center; gap: 14px; cursor: pointer;
+  text-align: left; font-family: inherit; color: var(--text); width: 100%;
+  position: relative; overflow: hidden; transition: transform .15s; }
+.theme-card:active { transform: scale(.98); }
+.theme-card-icon { font-size: 26px; flex-shrink: 0; }
+.theme-card-info { flex: 1; }
+.theme-card-title { font-size: 15px; font-weight: 800; }
+.theme-card-sub { color: var(--muted); font-size: 11px; margin-top: 3px; }
+.theme-progress-mini { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--surf3); }
+.theme-progress-fill { height: 100%; border-radius: 0 0 14px 14px; transition: width .5s; }
+
+/* FLASHCARD */
+.fc-meta { display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0; color: var(--muted); font-size: 13px; }
+.fc-track { flex: 1; height: 6px; background: var(--surf2); border-radius: 3px;
+  overflow: hidden; margin: 0 10px; }
+.fc-fill { height: 100%; border-radius: 3px; transition: width .4s; }
+.card-wrap { perspective: 1000px; margin: 8px 0 12px; cursor: pointer; }
+.card { background: var(--surf); border-radius: 20px; padding: 40px 24px;
+  min-height: 200px; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; text-align: center; gap: 10px;
+  border-top: 4px solid var(--accent); transition: transform .15s; }
+.card:active { transform: scale(.98); }
+.card-lang { color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+.card-word { font-size: 34px; font-weight: 900; line-height: 1.2; }
+.card-phonetic { color: var(--yellow); font-size: 15px; font-style: italic; }
+.card-translation { font-size: 20px; color: var(--accent); font-weight: 700; }
+.card-hint { color: var(--muted); font-size: 12px; margin-top: 8px; }
+.card-tag { background: var(--surf2); color: var(--muted); border-radius: 20px;
+  padding: 3px 10px; font-size: 11px; }
+.phonetic-btn { display: block; margin: 0 auto 12px; background: none;
+  border: 1px solid var(--surf3); border-radius: 20px; color: var(--muted);
+  cursor: pointer; font-size: 13px; padding: 6px 16px; font-family: inherit; }
+.fc-actions { display: flex; gap: 12px; margin-top: 4px; }
+.fc-btn { flex: 1; border: 2px solid; border-radius: 14px; padding: 14px 0;
+  font-weight: 800; font-size: 15px; cursor: pointer; font-family: inherit;
+  transition: transform .1s; }
+.fc-btn:active { transform: scale(.95); }
+.fc-btn-bad { background: #FF6B6B18; border-color: var(--red); color: var(--red); }
+.fc-btn-good { background: #4ECDC418; border-color: var(--teal); color: var(--teal); }
+
+/* GRAMMAR */
+.lesson-list { display: flex; flex-direction: column; gap: 10px; }
+.lesson-row { background: var(--surf); border: 1px solid var(--surf3); border-radius: 14px;
+  padding: 16px; display: flex; align-items: center; gap: 12px; cursor: pointer;
+  text-align: left; font-family: inherit; color: var(--text); width: 100%;
+  transition: transform .15s; }
+.lesson-row:active { transform: scale(.98); }
+.lesson-title { font-size: 15px; font-weight: 800; }
+.lesson-xp { color: var(--yellow); font-size: 12px; margin-top: 2px; }
+.lesson-content { background: var(--surf); border-radius: 20px; padding: 20px; line-height: 1.7; }
+.lesson-content h3 { font-size: 15px; margin: 14px 0 4px; }
+.lesson-content p { font-size: 14px; color: var(--text); margin: 6px 0; }
+.lesson-content .bullet { display: flex; gap: 8px; font-size: 14px; margin: 4px 0; padding-left: 4px; }
+.highlight { color: var(--yellow); font-weight: 800; }
+.lesson-tip { border-radius: 12px; padding: 12px; display: flex; gap: 8px;
+  align-items: flex-start; margin-top: 14px; }
+.lesson-tip-text { font-size: 13px; font-weight: 700; }
+
+/* EXERCISE */
+.diff-grid { display: flex; flex-direction: column; gap: 12px; margin: 12px 0; }
+.diff-btn { background: var(--surf); border: 2px solid var(--surf3); border-radius: 14px;
+  padding: 16px; display: flex; align-items: center; gap: 12px; cursor: pointer;
+  font-family: inherit; color: var(--text); font-size: 15px; font-weight: 700;
+  text-align: left; width: 100%; transition: border-color .15s; }
+.diff-btn.selected { border-color: var(--accent); background: #6C63FF18; }
+.diff-info { display: flex; flex-direction: column; }
+.diff-sub { color: var(--muted); font-size: 11px; font-weight: 400; margin-top: 2px; }
+.ex-progress { height: 6px; background: var(--surf2); border-radius: 3px; overflow: hidden; margin: 8px 0 12px; }
+.ex-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--teal));
+  border-radius: 3px; transition: width .4s; }
+.score-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.q-card { background: var(--surf); border-radius: 20px; padding: 20px; margin-bottom: 14px; }
+.q-theme { color: var(--muted); font-size: 12px; margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+.q-text { font-size: 18px; font-weight: 800; line-height: 1.4; }
+.q-original { color: var(--accent); font-size: 14px; margin-top: 8px; font-style: italic; }
+.choices { display: flex; flex-direction: column; gap: 10px; }
+.choice { background: var(--surf); border: 2px solid var(--surf3); border-radius: 14px;
+  padding: 14px 16px; font-family: inherit; color: var(--text); font-size: 15px;
+  cursor: pointer; text-align: left; font-weight: 600; transition: all .15s; width: 100%; }
+.choice.correct { background: #4ECDC418; border-color: var(--teal); color: var(--teal); }
+.choice.wrong { background: #FF6B6B18; border-color: var(--red); color: var(--red); }
+.choice:active { transform: scale(.99); }
+
+/* AI EXERCISE */
+.ai-box { background: linear-gradient(135deg, #6C63FF18, #4ECDC418);
+  border: 1px solid var(--accent); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
+.ai-title { font-size: 15px; font-weight: 800; color: var(--accent); margin-bottom: 4px; }
+.ai-sub { color: var(--muted); font-size: 12px; }
+.ai-controls { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.ai-select { background: var(--surf2); border: 1px solid var(--surf3); border-radius: 10px;
+  color: var(--text); font-family: inherit; font-size: 13px; padding: 8px 12px; flex: 1; min-width: 120px; }
+.loading-dots { display: flex; gap: 6px; justify-content: center; padding: 20px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); animation: bounce .8s infinite; }
+.dot:nth-child(2) { animation-delay: .15s; }
+.dot:nth-child(3) { animation-delay: .3s; }
+@keyframes bounce { 0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)} }
+
+/* RESULT */
+.result { display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 70vh; gap: 12px; text-align: center; padding: 0 16px; }
+.result-emoji { font-size: 72px; }
+.result-title { font-size: 26px; font-weight: 900; }
+.result-score { font-size: 56px; font-weight: 900;
+  background: linear-gradient(90deg, var(--accent), var(--teal));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.result-xp { color: var(--yellow); font-size: 18px; font-weight: 800; }
+.result-msg { color: var(--muted); font-size: 14px; }
+.btn-row { display: flex; gap: 10px; width: 100%; max-width: 320px; margin-top: 8px; }
+
+/* BUTTONS */
+.btn-primary { background: linear-gradient(90deg, var(--accent), var(--teal)); border: none;
+  border-radius: 14px; padding: 16px; font-family: inherit; color: #fff;
+  font-size: 16px; font-weight: 800; cursor: pointer; width: 100%; transition: opacity .15s; }
+.btn-primary:active { opacity: .85; }
+.btn-secondary { background: var(--surf); border: 2px solid var(--surf3); border-radius: 14px;
+  padding: 14px; font-family: inherit; color: var(--text); font-size: 15px; font-weight: 700;
+  cursor: pointer; flex: 1; }
+
+/* BACK BAR */
+.back-bar { display: flex; align-items: center; gap: 10px; padding: calc(var(--safe-top) + 12px) 0 10px;
+  position: sticky; top: 0; background: var(--bg); z-index: 10; }
+.back-btn { background: none; border: none; color: var(--accent); cursor: pointer;
+  font-size: 14px; font-weight: 800; font-family: inherit; padding: 0; display: flex; align-items: center; gap: 4px; }
+.back-title { font-size: 18px; font-weight: 900; flex: 1; }
+.back-badge { background: var(--surf2); border-radius: 20px; padding: 3px 10px; font-size: 11px; color: var(--muted); }
+
+/* INSTALL BANNER */
+.install-banner { background: linear-gradient(90deg, var(--accent), var(--teal));
+  border-radius: 14px; padding: 14px 16px; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 12px; }
+.install-text { flex: 1; }
+.install-title { font-size: 14px; font-weight: 800; color: #fff; }
+.install-sub { font-size: 11px; color: rgba(255,255,255,.7); margin-top: 2px; }
+.install-close { background: none; border: none; color: #fff; cursor: pointer; font-size: 18px; }
+
+/* DONE CHECK */
+.done-check { color: var(--teal); font-size: 16px; }
+.word-count-badge { background: var(--surf2); border-radius: 20px; padding: 2px 8px; font-size: 11px; color: var(--muted); }
+</style>
 </head>
 <body>
-  <div id="app">
-    <main class="screen" id="main-screen"></main>
-    
-    <nav id="nav">
-      <button class="nav-btn active" onclick="navigate('home')" id="nav-home">
-        <span class="nav-icon">🏠</span>Accueil
-      </button>
-      <button class="nav-btn" onclick="navigate('vocab')" id="nav-vocab">
-        <span class="nav-icon">📚</span>Vocab
-      </button>
-      <button class="nav-btn" onclick="navigate('grammar')" id="nav-grammar">
-        <span class="nav-icon">📝</span>Grammaire
-      </button>
-      <button class="nav-btn" onclick="navigate('exercise')" id="nav-exercise">
-        <span class="nav-icon">💪</span>Exercices
-      </button>
-      <button class="nav-btn" onclick="navigate('settings')" id="nav-settings">
-        <span class="nav-icon">⚙️</span>Réglages
-      </button>
-    </nav>
-  </div>
+<div id="app">
+  <div class="screen" id="main-screen"></div>
+  <nav id="nav">
+    <button class="nav-btn active" onclick="navigate('home')" id="nav-home">
+      <span class="nav-icon">🏠</span>Accueil
+    </button>
+    <button class="nav-btn" onclick="navigate('vocab')" id="nav-vocab">
+      <span class="nav-icon">📚</span>Vocab
+    </button>
+    <button class="nav-btn" onclick="navigate('grammar')" id="nav-grammar">
+      <span class="nav-icon">📝</span>Grammaire
+    </button>
+    <button class="nav-btn" onclick="navigate('exercise')" id="nav-exercise">
+      <span class="nav-icon">💪</span>Exercices
+    </button>
+  </nav>
+</div>
 
-  <script src="data.js"></script>
-  <script src="app.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA - THÈMES & MOTS
+// ═══════════════════════════════════════════════════════════
+const THEMES = {
+  salutations: {
+    label:"Salutations & Politesse", icon:"👋", color:"#FF6B6B",
+    words:[
+      {mg:"Manahoana",fr:"Bonjour / Salut",ph:"ma-na-OO-na"},
+      {mg:"Veloma",fr:"Au revoir",ph:"ve-LOO-ma"},
+      {mg:"Misaotra",fr:"Merci",ph:"mi-SOW-tra"},
+      {mg:"Azafady",fr:"S'il vous plaît / Excusez-moi",ph:"a-za-FA-di"},
+      {mg:"Eny",fr:"Oui",ph:"EH-ni"},
+      {mg:"Tsia",fr:"Non",ph:"TSYA"},
+      {mg:"Ahoana ny vaovao?",fr:"Comment ça va ?",ph:"a-OO-na ni vaw-VAW"},
+      {mg:"Tsara",fr:"Bien / Bon",ph:"TSA-ra"},
+      {mg:"Tsy tsara",fr:"Pas bien",ph:"tsi TSA-ra"},
+      {mg:"Inona ny anaranao?",fr:"Comment vous appelez-vous ?",ph:"i-NOO-na ni a-na-RA-now"},
+      {mg:"Ny anarako dia...",fr:"Je m'appelle...",ph:"ni a-na-RA-koo di-a"},
+      {mg:"Avy aiza ianao?",fr:"D'où venez-vous ?",ph:"a-vi AY-za ya-NAW"},
+      {mg:"Faly mahafantatra anao",fr:"Enchanté(e)",ph:"FA-li ma-ha-fan-TA-tra a-NOW"},
+      {mg:"Misaotra betsaka",fr:"Merci beaucoup",ph:"mi-SOW-tra beh-TSA-ka"},
+      {mg:"Tsy misy fisaorana",fr:"De rien",ph:"tsi MI-si fi-saw-RA-na"},
+      {mg:"Mifankaherezà",fr:"Courage !",ph:"mi-fan-ka-heh-reh-ZA"},
+      {mg:"Sambatra",fr:"Heureux / Félicitations",ph:"sam-BA-tra"},
+      {mg:"Tongasoa",fr:"Bienvenu(e)",ph:"toon-ga-SOO-a"},
+      {mg:"Mandrampihaona",fr:"À bientôt",ph:"man-dram-pi-ha-OO-na"},
+      {mg:"Aleha tsara",fr:"Bon voyage",ph:"a-LEH-a TSA-ra"},
+      {mg:"Toky",fr:"Promesse / Confiance",ph:"TOO-ki"},
+      {mg:"Faniriana tsara",fr:"Meilleurs vœux",ph:"fa-ni-RI-a-na TSA-ra"},
+      {mg:"Trarantitra",fr:"Longue vie",ph:"tra-ran-TEE-tra"},
+      {mg:"Miala tsiny",fr:"Pardon / Je suis désolé",ph:"mi-A-la TSI-ni"},
+      {mg:"Maninona?",fr:"Pourquoi ?",ph:"ma-ni-NOO-na"},
+      {mg:"Iza ianao?",fr:"Qui es-tu ?",ph:"I-za ya-NAW"},
+      {mg:"Aiza...?",fr:"Où est... ?",ph:"AY-za"},
+      {mg:"Firy?",fr:"Combien ?",ph:"FEE-ri"},
+      {mg:"Oviana?",fr:"Quand ?",ph:"oo-vi-A-na"},
+      {mg:"Ahoana?",fr:"Comment ?",ph:"a-OO-na"},
+    ]
+  },
+  famille: {
+    label:"Famille & Relations", icon:"👨‍👩‍👧", color:"#4ECDC4",
+    words:[
+      {mg:"Reny",fr:"Mère",ph:"REH-ni"},
+      {mg:"Ray",fr:"Père",ph:"RAY"},
+      {mg:"Zaza",fr:"Enfant",ph:"ZA-za"},
+      {mg:"Rahalahy",fr:"Frère",ph:"ra-ha-LA-hi"},
+      {mg:"Anabavy",fr:"Sœur",ph:"a-na-BA-vi"},
+      {mg:"Dadabe",fr:"Grand-père",ph:"da-da-BEH"},
+      {mg:"Nenibe",fr:"Grand-mère",ph:"ne-ni-BEH"},
+      {mg:"Zanaka",fr:"Fils / Fille",ph:"za-NA-ka"},
+      {mg:"Fianakaviana",fr:"Famille",ph:"fi-a-na-ka-vi-A-na"},
+      {mg:"Vady",fr:"Époux / Épouse",ph:"VA-di"},
+      {mg:"Havana",fr:"Parent / Cousin",ph:"ha-VA-na"},
+      {mg:"Zokiny",fr:"Aîné(e)",ph:"zoo-KI-ni"},
+      {mg:"Zandry",fr:"Cadet / Cadette",ph:"ZAN-dri"},
+      {mg:"Zama",fr:"Oncle maternel",ph:"ZA-ma"},
+      {mg:"Raman-dreniny",fr:"Oncle",ph:"ra-man-dreh-NI-ni"},
+      {mg:"Iray ray aman-dreny",fr:"Demi-frère/sœur",ph:"i-RAY RAY a-man-DREH-ni"},
+      {mg:"Taranaka",fr:"Descendant / Génération",ph:"ta-ra-NA-ka"},
+      {mg:"Iray fianakaviana",fr:"De la même famille",ph:"i-RAY fi-a-na-ka-vi-A-na"},
+      {mg:"Mpivady",fr:"Couple / Époux",ph:"mpi-VA-di"},
+      {mg:"Zazakely",fr:"Bébé / Petit enfant",ph:"za-za-KEH-li"},
+      {mg:"Tovolahy",fr:"Jeune homme",ph:"too-voo-LA-hi"},
+      {mg:"Tovovavy",fr:"Jeune femme",ph:"too-voo-VA-vi"},
+      {mg:"Lehilahy",fr:"Homme",ph:"leh-hi-LA-hi"},
+      {mg:"Vehivavy",fr:"Femme",ph:"veh-hi-VA-vi"},
+      {mg:"Rangahy",fr:"Monsieur / Vieillard",ph:"ran-GA-hi"},
+      {mg:"Ranaivo",fr:"Nom propre courant",ph:"ra-NAY-voo"},
+      {mg:"Mpampianatra",fr:"Enseignant",ph:"mpam-pi-a-NA-tra"},
+      {mg:"Mpitsabo",fr:"Médecin / Infirmier",ph:"mpi-TSA-boo"},
+      {mg:"Namana",fr:"Ami(e)",ph:"na-MA-na"},
+      {mg:"Ati-tanàna",fr:"Voisin(age)",ph:"a-ti-ta-NA-na"},
+    ]
+  },
+  corps: {
+    label:"Corps humain", icon:"🧍", color:"#FF8C69",
+    words:[
+      {mg:"Vatana",fr:"Corps",ph:"VA-ta-na"},
+      {mg:"Loha",fr:"Tête",ph:"LOO-ha"},
+      {mg:"Fo",fr:"Cœur",ph:"FOO"},
+      {mg:"Tanana",fr:"Main",ph:"ta-NA-na"},
+      {mg:"Tongotra",fr:"Pied / Jambe",ph:"toon-GOO-tra"},
+      {mg:"Maso",fr:"Œil / Yeux",ph:"MA-soo"},
+      {mg:"Sofina",fr:"Oreille",ph:"soo-FI-na"},
+      {mg:"Orona",fr:"Nez",ph:"oo-ROO-na"},
+      {mg:"Vava",fr:"Bouche",ph:"VA-va"},
+      {mg:"Nify",fr:"Dent",ph:"NI-fi"},
+      {mg:"Lela",fr:"Langue",ph:"LEH-la"},
+      {mg:"Volom-bava",fr:"Moustache / Barbe",ph:"voo-loom-BA-va"},
+      {mg:"Voló",fr:"Cheveux",ph:"voo-LOO"},
+      {mg:"Hoditra",fr:"Peau",ph:"hoo-DI-tra"},
+      {mg:"Taolana",fr:"Os",ph:"taw-LA-na"},
+      {mg:"Ra",fr:"Sang",ph:"RA"},
+      {mg:"Atidoha",fr:"Cerveau",ph:"a-ti-DOO-ha"},
+      {mg:"Kibasy",fr:"Ventre",ph:"ki-BA-si"},
+      {mg:"Aorta",fr:"Artère",ph:"a-OR-ta"},
+      {mg:"Rantsana",fr:"Membre / Branche",ph:"ran-TSA-na"},
+      {mg:"Molotra",fr:"Lèvre",ph:"moo-LOO-tra"},
+      {mg:"Tavy",fr:"Joue",ph:"TA-vi"},
+      {mg:"Vohoka",fr:"Gorge / Cou",ph:"voo-HOO-ka"},
+      {mg:"Kibon'aina",fr:"Poumon",ph:"ki-boo-NAY-na"},
+      {mg:"Afo-kibasy",fr:"Estomac",ph:"a-foo-ki-BA-si"},
+      {mg:"Fivalanana",fr:"Intestin",ph:"fi-va-la-NA-na"},
+      {mg:"Revy",fr:"Foie",ph:"REH-vi"},
+      {mg:"Omby-vala",fr:"Reins",ph:"oom-bi-VA-la"},
+      {mg:"Sandry",fr:"Épaule / Bras",ph:"SAN-dri"},
+      {mg:"Hataka",fr:"Genou",ph:"ha-TA-ka"},
+    ]
+  },
+  maison: {
+    label:"Maison & Intérieur", icon:"🏠", color:"#C3B1E1",
+    words:[
+      {mg:"Trano",fr:"Maison / Bâtiment",ph:"TRA-noo"},
+      {mg:"Varavarana",fr:"Porte",ph:"va-ra-va-RA-na"},
+      {mg:"Varavarankely",fr:"Fenêtre",ph:"va-ra-va-ran-KEH-li"},
+      {mg:"Trano-fisakafoanana",fr:"Cuisine",ph:"TRA-noo fi-sa-ka-fwa-NA-na"},
+      {mg:"Efitrano fatory",fr:"Chambre",ph:"eh-fi-TRA-noo FA-too-ri"},
+      {mg:"Efitrano fidiovana",fr:"Salle de bain",ph:"eh-fi-TRA-noo fi-di-oo-VA-na"},
+      {mg:"Efitrano fihinanana",fr:"Salle à manger",ph:"eh-fi-TRA-noo fi-hi-na-NA-na"},
+      {mg:"Sezam-be",fr:"Salon / Grande salle",ph:"seh-zam-BEH"},
+      {mg:"Tafa-dranomasina",fr:"Toit",ph:"ta-fa-dra-noo-ma-SI-na"},
+      {mg:"Rindrina",fr:"Mur",ph:"rin-DRI-na"},
+      {mg:"Gorodona",fr:"Plafond",ph:"goo-roo-DOO-na"},
+      {mg:"Varembony",fr:"Plancher",ph:"va-rem-BOO-ni"},
+      {mg:"Fandriana",fr:"Lit",ph:"fan-dri-A-na"},
+      {mg:"Seza",fr:"Chaise",ph:"SEH-za"},
+      {mg:"Latabatra",fr:"Table",ph:"la-ta-BA-tra"},
+      {mg:"Efitrano",fr:"Pièce / Chambre",ph:"eh-fi-TRA-noo"},
+      {mg:"Hazondrano",fr:"Robinet / Eau courante",ph:"ha-zoon-DRA-noo"},
+      {mg:"Jiro",fr:"Lumière / Lampe",ph:"JI-roo"},
+      {mg:"Lasantsy",fr:"Électricité",ph:"la-san-TSI"},
+      {mg:"Fitaovana",fr:"Outil / Ustensile",ph:"fi-taw-VA-na"},
+      {mg:"Fisakafoanana",fr:"Cuisine (action)",ph:"fi-sa-ka-fwa-NA-na"},
+      {mg:"Tavoahangy",fr:"Armoire",ph:"ta-vwa-HAN-gi"},
+      {mg:"Sinimasy",fr:"Miroir",ph:"si-ni-MA-si"},
+      {mg:"Sarona",fr:"Rideau",ph:"sa-ROO-na"},
+      {mg:"Mosara",fr:"Tapis",ph:"moo-SA-ra"},
+      {mg:"Lambam-pandriana",fr:"Couverture / Drap",ph:"lam-bam-pan-dri-A-na"},
+      {mg:"Kodiarana",fr:"Bain / Baignoire",ph:"koo-di-a-RA-na"},
+      {mg:"Fatana",fr:"Four / Cuisinière",ph:"fa-TA-na"},
+      {mg:"Fantina",fr:"Puits / Fontaine",ph:"fan-TI-na"},
+      {mg:"Vava-trano",fr:"Couloir / Entrée",ph:"va-va-TRA-noo"},
+    ]
+  },
+  nourriture: {
+    label:"Nourriture & Cuisine", icon:"🍚", color:"#A8E6CF",
+    words:[
+      {mg:"Vary",fr:"Riz",ph:"VA-ri"},
+      {mg:"Ronono",fr:"Lait",ph:"roo-NOO-noo"},
+      {mg:"Rano",fr:"Eau",ph:"RA-noo"},
+      {mg:"Henakisoa",fr:"Porc",ph:"heh-na-ki-SOO-a"},
+      {mg:"Henomby",fr:"Bœuf",ph:"heh-NOOM-bi"},
+      {mg:"Akondro",fr:"Banane",ph:"a-KOON-droo"},
+      {mg:"Mofo",fr:"Pain",ph:"MOO-foo"},
+      {mg:"Sakafo",fr:"Repas / Nourriture",ph:"sa-KA-foo"},
+      {mg:"Hena",fr:"Viande",ph:"HEH-na"},
+      {mg:"Hazandrano",fr:"Poisson",ph:"ha-zan-DRA-noo"},
+      {mg:"Legioma",fr:"Légume",ph:"leh-gi-OO-ma"},
+      {mg:"Voankazo",fr:"Fruit",ph:"vwan-KA-zoo"},
+      {mg:"Romazava",fr:"Soupe de brèdes",ph:"roo-ma-ZA-va"},
+      {mg:"Laoka",fr:"Accompagnement",ph:"LAW-ka"},
+      {mg:"Sira",fr:"Sel",ph:"SI-ra"},
+      {mg:"Siramamy",fr:"Sucre",ph:"si-ra-MA-mi"},
+      {mg:"Dihy",fr:"Huile",ph:"DI-hi"},
+      {mg:"Tsaramaso",fr:"Haricots",ph:"tsa-ra-MA-soo"},
+      {mg:"Voatabia",fr:"Tomate",ph:"vwa-ta-BI-a"},
+      {mg:"Voaniomby",fr:"Arachide",ph:"vwa-ni-OOM-bi"},
+      {mg:"Katsaka",fr:"Maïs",ph:"kat-SA-ka"},
+      {mg:"Paoma",fr:"Pomme",ph:"PAW-ma"},
+      {mg:"Voavoanjo",fr:"Raisin",ph:"vwa-vwan-JOO"},
+      {mg:"Litchisy",fr:"Litchi",ph:"li-TSI-si"},
+      {mg:"Manga",fr:"Mangue",ph:"MA-nga"},
+      {mg:"Kabaro",fr:"Ananas",ph:"ka-BA-roo"},
+      {mg:"Café",fr:"Café",ph:"ka-FEH"},
+      {mg:"Dite",fr:"Thé",ph:"DI-teh"},
+      {mg:"Toaka",fr:"Rhum / Alcool",ph:"TWA-ka"},
+      {mg:"Tsikonina",fr:"Épice",ph:"tsi-koo-NI-na"},
+    ]
+  },
+  chiffres: {
+    label:"Chiffres & Mathématiques", icon:"🔢", color:"#FFD93D",
+    words:[
+      {mg:"Iray",fr:"Un (1)",ph:"EE-ray"},
+      {mg:"Roa",fr:"Deux (2)",ph:"ROO-a"},
+      {mg:"Telo",fr:"Trois (3)",ph:"TEH-loo"},
+      {mg:"Efatra",fr:"Quatre (4)",ph:"EH-fa-tra"},
+      {mg:"Dimy",fr:"Cinq (5)",ph:"DEE-mi"},
+      {mg:"Enina",fr:"Six (6)",ph:"EH-ni-na"},
+      {mg:"Fito",fr:"Sept (7)",ph:"FEE-too"},
+      {mg:"Valo",fr:"Huit (8)",ph:"VA-loo"},
+      {mg:"Sivy",fr:"Neuf (9)",ph:"SI-vi"},
+      {mg:"Folo",fr:"Dix (10)",ph:"FOO-loo"},
+      {mg:"Efapolo",fr:"Quarante (40)",ph:"eh-fa-POO-loo"},
+      {mg:"Dimampolo",fr:"Cinquante (50)",ph:"di-mam-POO-loo"},
+      {mg:"Fitopolo",fr:"Soixante-dix (70)",ph:"fi-too-POO-loo"},
+      {mg:"Valo amby folo",fr:"Dix-huit (18)",ph:"VA-loo am-bi FOO-loo"},
+      {mg:"Zato",fr:"Cent (100)",ph:"ZA-too"},
+      {mg:"Arivo",fr:"Mille (1000)",ph:"a-RI-voo"},
+      {mg:"Alina",fr:"Dix mille",ph:"a-LI-na"},
+      {mg:"Tapitrisany",fr:"Million",ph:"ta-pi-tri-SA-ni"},
+      {mg:"Voalohany",fr:"Premier",ph:"vwa-loo-HA-ni"},
+      {mg:"Faharoa",fr:"Deuxième",ph:"fa-ha-ROO-a"},
+      {mg:"Fahatelo",fr:"Troisième",ph:"fa-ha-TEH-loo"},
+      {mg:"Bisara",fr:"Pair",ph:"bi-SA-ra"},
+      {mg:"Omby",fr:"Plus",ph:"OOM-bi"},
+      {mg:"Latsaka",fr:"Moins",ph:"lat-SA-ka"},
+      {mg:"Farafahiny",fr:"Au minimum",ph:"fa-ra-fa-HI-ni"},
+      {mg:"Saika",fr:"Presque",ph:"SAY-ka"},
+      {mg:"Maherin'ny",fr:"Plus de...",ph:"ma-heh-rin-ni"},
+      {mg:"Tapany",fr:"La moitié",ph:"ta-PA-ni"},
+      {mg:"Ampahefatry",fr:"Un quart",ph:"am-pa-heh-FA-tri"},
+      {mg:"Isaky",fr:"Chaque / Par",ph:"i-SA-ki"},
+    ]
+  },
+  couleurs: {
+    label:"Couleurs & Formes", icon:"🎨", color:"#FF6B6B",
+    words:[
+      {mg:"Mena",fr:"Rouge",ph:"MEH-na"},
+      {mg:"Manga",fr:"Bleu / Vert",ph:"MA-nga"},
+      {mg:"Fotsy",fr:"Blanc",ph:"FOOT-si"},
+      {mg:"Mainty",fr:"Noir",ph:"MAY-nti"},
+      {mg:"Mavo",fr:"Jaune",ph:"MA-voo"},
+      {mg:"Volom-boankazo",fr:"Orange",ph:"voo-loom-bwan-KA-zoo"},
+      {mg:"Vony",fr:"Rose",ph:"VOO-ni"},
+      {mg:"Volondavenona",fr:"Gris",ph:"voo-loon-da-ve-NOO-na"},
+      {mg:"Maitso",fr:"Vert (clair)",ph:"MAY-tsoo"},
+      {mg:"Mangamahery",fr:"Bleu foncé",ph:"ma-nga-ma-HEH-ri"},
+      {mg:"Bontana",fr:"Violet",ph:"boon-TA-na"},
+      {mg:"Volondahy",fr:"Marron",ph:"voo-loon-DA-hi"},
+      {mg:"Mazava",fr:"Clair / Lumineux",ph:"ma-ZA-va"},
+      {mg:"Maizina",fr:"Sombre / Foncé",ph:"may-ZI-na"},
+      {mg:"Boribory",fr:"Rond / Circulaire",ph:"boo-ri-BOO-ri"},
+      {mg:"Mirefy-polo",fr:"Carré",ph:"mi-reh-fi-POO-loo"},
+      {mg:"Tatsaka",fr:"Vertical / Droit",ph:"tat-SA-ka"},
+      {mg:"Lalina",fr:"Profond",ph:"la-LI-na"},
+      {mg:"Sarobidy",fr:"Précieux / Brillant",ph:"sa-roo-BI-di"},
+      {mg:"Mangatsiaka",fr:"Froid (couleur froide)",ph:"man-ga-tsi-A-ka"},
+      {mg:"Mafana",fr:"Chaud (couleur chaude)",ph:"ma-FA-na"},
+      {mg:"Tsara tarehy",fr:"Beau / Belle",ph:"TSA-ra ta-REH-hi"},
+      {mg:"Ratsy tarehy",fr:"Laid(e)",ph:"RA-tsi ta-REH-hi"},
+      {mg:"Velon'aina",fr:"Vif / Vivant",ph:"veh-loon-AY-na"},
+      {mg:"Mitovy",fr:"Identique / Pareil",ph:"mi-TOO-vi"},
+      {mg:"Samy hafa",fr:"Différent",ph:"SA-mi HA-fa"},
+      {mg:"Kely",fr:"Petit",ph:"KEH-li"},
+      {mg:"Lehibe",fr:"Grand",ph:"leh-HI-beh"},
+      {mg:"Lava",fr:"Long / Grand",ph:"LA-va"},
+      {mg:"Fohy",fr:"Court / Petit",ph:"FOO-hi"},
+    ]
+  },
+  nature: {
+    label:"Nature & Environnement", icon:"🌿", color:"#6BCB77",
+    words:[
+      {mg:"Ala",fr:"Forêt",ph:"A-la"},
+      {mg:"Renirano",fr:"Fleuve / Rivière",ph:"reh-ni-RA-noo"},
+      {mg:"Ranomasina",fr:"Mer / Océan",ph:"ra-noo-ma-SI-na"},
+      {mg:"Tendrombohitra",fr:"Montagne",ph:"ten-droo-BOO-hi-tra"},
+      {mg:"Lemaka",fr:"Plaine",ph:"leh-MA-ka"},
+      {mg:"Lohasaha",fr:"Vallée",ph:"loo-ha-SA-ha"},
+      {mg:"Ranomafana",fr:"Source chaude",ph:"ra-noo-ma-FA-na"},
+      {mg:"Tany",fr:"Terre / Sol",ph:"TA-ni"},
+      {mg:"Vato",fr:"Pierre / Rocher",ph:"VA-too"},
+      {mg:"Hazavana",fr:"Lumière naturelle",ph:"ha-za-VA-na"},
+      {mg:"Rivotra",fr:"Vent",ph:"ri-VOO-tra"},
+      {mg:"Orana",fr:"Pluie",ph:"oo-RA-na"},
+      {mg:"Masoandro",fr:"Soleil",ph:"ma-swan-DROO"},
+      {mg:"Volana",fr:"Lune",ph:"voo-LA-na"},
+      {mg:"Kintana",fr:"Étoile",ph:"kin-TA-na"},
+      {mg:"Rahona",fr:"Nuage",ph:"ra-HOO-na"},
+      {mg:"Ranorano",fr:"Lac",ph:"ra-noo-RA-noo"},
+      {mg:"Onjan-dranomasina",fr:"Vague",ph:"oon-jan-dra-noo-ma-SI-na"},
+      {mg:"Hazo",fr:"Arbre",ph:"HA-zoo"},
+      {mg:"Ahitra",fr:"Herbe",ph:"a-HI-tra"},
+      {mg:"Voninkazo",fr:"Fleur",ph:"voo-nin-KA-zoo"},
+      {mg:"Kitro",fr:"Feuille",ph:"KI-troo"},
+      {mg:"Voankazo",fr:"Fruit",ph:"vwan-KA-zoo"},
+      {mg:"Bibikely",fr:"Insecte",ph:"bi-bi-KEH-li"},
+      {mg:"Vorona",fr:"Oiseau",ph:"voo-ROO-na"},
+      {mg:"Omby",fr:"Zébu / Bœuf",ph:"OOM-bi"},
+      {mg:"Alika",fr:"Chien",ph:"a-LI-ka"},
+      {mg:"Saka",fr:"Chat",ph:"SA-ka"},
+      {mg:"Lambo",fr:"Sanglier malgache",ph:"LAM-boo"},
+      {mg:"Akoho",fr:"Poulet",ph:"a-KOO-hoo"},
+    ]
+  },
+  voyages: {
+    label:"Voyages & Transports", icon:"✈️", color:"#FFB347",
+    words:[
+      {mg:"Lalana",fr:"Route / Chemin",ph:"la-LA-na"},
+      {mg:"Fiara",fr:"Voiture",ph:"fi-A-ra"},
+      {mg:"Fiaramanidina",fr:"Avion",ph:"fi-a-ra-ma-ni-DI-na"},
+      {mg:"Hotely",fr:"Hôtel",ph:"hoo-TEH-li"},
+      {mg:"Tanàna",fr:"Ville / Village",ph:"ta-NA-na"},
+      {mg:"Faritra",fr:"Région",ph:"fa-RI-tra"},
+      {mg:"Toerana",fr:"Endroit / Lieu",ph:"too-EH-ra-na"},
+      {mg:"Samy",fr:"Tous / Ensemble",ph:"SA-mi"},
+      {mg:"Fiaran-dàlana",fr:"Bus / Taxi-brousse",ph:"fi-a-ran-DA-la-na"},
+      {mg:"Tàgnamaro",fr:"Gare",ph:"tag-na-MA-roo"},
+      {mg:"Seranam-piaramanidina",fr:"Aéroport",ph:"seh-ra-nam-pi-a-ra-ma-ni-DI-na"},
+      {mg:"Seranan-tsambo",fr:"Port",ph:"seh-ra-nan-TSAM-boo"},
+      {mg:"Tsambo",fr:"Bateau",ph:"TSAM-boo"},
+      {mg:"Lalamby",fr:"Train",ph:"la-LAM-bi"},
+      {mg:"Moto",fr:"Moto",ph:"MOO-too"},
+      {mg:"Kalesy",fr:"Pousse-pousse",ph:"ka-LEH-si"},
+      {mg:"Lalam-pirenena",fr:"Route nationale",ph:"la-lam-pi-reh-NEH-na"},
+      {mg:"Ankohonan'ny",fr:"Quartier de",ph:"an-koo-hoo-nan-ni"},
+      {mg:"Motel",fr:"Motel",ph:"moo-TEL"},
+      {mg:"Fitsaharana",fr:"Repos / Vacances",ph:"fi-tsa-ha-RA-na"},
+      {mg:"Sata-pirenena",fr:"Passeport",ph:"sa-ta-pi-reh-NEH-na"},
+      {mg:"Viza",fr:"Visa",ph:"VI-za"},
+      {mg:"Mifindra",fr:"Déménager / Se déplacer",ph:"mi-FIN-dra"},
+      {mg:"Miakatra",fr:"Monter",ph:"mi-a-KA-tra"},
+      {mg:"Midina",fr:"Descendre",ph:"mi-DI-na"},
+      {mg:"Mivoaka",fr:"Sortir",ph:"mi-VWAK-a"},
+      {mg:"Miditra",fr:"Entrer",ph:"mi-DI-tra"},
+      {mg:"Avy",fr:"Venir / Arriver",ph:"A-vi"},
+      {mg:"Mandeha",fr:"Aller / Marcher",ph:"man-DEH-ha"},
+      {mg:"Miverina",fr:"Retourner / Revenir",ph:"mi-veh-RI-na"},
+    ]
+  },
+  temps: {
+    label:"Temps & Météo", icon:"⏰", color:"#87CEEB",
+    words:[
+      {mg:"Andro",fr:"Jour",ph:"AN-droo"},
+      {mg:"Alina",fr:"Nuit",ph:"a-LI-na"},
+      {mg:"Maraina",fr:"Matin",ph:"ma-RAY-na"},
+      {mg:"Tolakandro",fr:"Après-midi",ph:"too-la-KAN-droo"},
+      {mg:"Hariva",fr:"Soir",ph:"ha-RI-va"},
+      {mg:"Herinandro",fr:"Semaine",ph:"heh-ri-NAN-droo"},
+      {mg:"Volana",fr:"Mois",ph:"voo-LA-na"},
+      {mg:"Taona",fr:"Année",ph:"TAW-na"},
+      {mg:"Androany",fr:"Aujourd'hui",ph:"an-dro-A-ni"},
+      {mg:"Omaly",fr:"Hier",ph:"oo-MA-li"},
+      {mg:"Rahampitso",fr:"Demain",ph:"ra-ham-PI-tsoo"},
+      {mg:"Avy hatrany",fr:"Maintenant / Tout de suite",ph:"a-vi ha-TRA-ni"},
+      {mg:"Farany",fr:"Dernier / Enfin",ph:"fa-RA-ni"},
+      {mg:"Voalohany",fr:"D'abord / Premièrement",ph:"vwa-loo-HA-ni"},
+      {mg:"Indray mandeha",fr:"Une fois",ph:"in-dray man-DEH-ha"},
+      {mg:"Matetika",fr:"Souvent / Fréquemment",ph:"ma-teh-TI-ka"},
+      {mg:"Miadana",fr:"Lentement",ph:"mi-a-DA-na"},
+      {mg:"Faingana",fr:"Vite / Rapidement",ph:"fay-NGA-na"},
+      {mg:"Ankehitriny",fr:"Maintenant / À présent",ph:"an-keh-hi-TRI-ni"},
+      {mg:"Taloha",fr:"Avant / Autrefois",ph:"ta-LOO-ha"},
+      {mg:"Aoriana",fr:"Après / Plus tard",ph:"awr-i-A-na"},
+      {mg:"Ora",fr:"Heure",ph:"OO-ra"},
+      {mg:"Minitra",fr:"Minute",ph:"mi-NI-tra"},
+      {mg:"Segondra",fr:"Seconde",ph:"seh-GON-dra"},
+      {mg:"Asabotsy",fr:"Samedi",ph:"a-sa-BOT-si"},
+      {mg:"Alahady",fr:"Dimanche",ph:"a-la-HA-di"},
+      {mg:"Alatsinainy",fr:"Lundi",ph:"a-lat-si-NAY-ni"},
+      {mg:"Talata",fr:"Mardi",ph:"ta-LA-ta"},
+      {mg:"Alarobia",fr:"Mercredi",ph:"a-la-ROO-bi-a"},
+      {mg:"Alakamisy",fr:"Jeudi",ph:"a-la-ka-MI-si"},
+    ]
+  },
+  sante: {
+    label:"Santé & Médecine", icon:"🏥", color:"#FF9999",
+    words:[
+      {mg:"Aretin'aretina",fr:"Maladie",ph:"a-reh-ti-na-reh-TI-na"},
+      {mg:"Fanafody",fr:"Médicament",ph:"fa-na-FOO-di"},
+      {mg:"Dokotera",fr:"Médecin",ph:"doo-koo-TEH-ra"},
+      {mg:"Hopitaly",fr:"Hôpital",ph:"hoo-pi-TA-li"},
+      {mg:"Marary",fr:"Malade / Douloureux",ph:"ma-RA-ri"},
+      {mg:"Fanafody-tsarotany",fr:"Ordonnance",ph:"fa-na-foo-di-tsa-roo-TA-ni"},
+      {mg:"Tsindronana",fr:"Piqûre / Injection",ph:"tsin-droo-NA-na"},
+      {mg:"Fitsaboana",fr:"Traitement / Soin",ph:"fi-tsa-bwa-NA"},
+      {mg:"Fery",fr:"Blessure",ph:"FEH-ri"},
+      {mg:"Ratra",fr:"Blessé",ph:"RA-tra"},
+      {mg:"Haavon'ny aretina",fr:"Symptôme",ph:"ha-a-voon-ni a-reh-TI-na"},
+      {mg:"Tazomoka",fr:"Paludisme / Fièvre",ph:"ta-zoo-MOO-ka"},
+      {mg:"Voro-bilona",fr:"Rhume / Grippe",ph:"voo-roo-bi-LOO-na"},
+      {mg:"Tazo",fr:"Fièvre",ph:"TA-zoo"},
+      {mg:"Fanaintainana",fr:"Douleur",ph:"fa-nay-tay-NA-na"},
+      {mg:"Kibon'aretina",fr:"Ventre malade",ph:"ki-boon-a-reh-TI-na"},
+      {mg:"Fivalanana",fr:"Diarrhée (intestin)",ph:"fi-va-la-NA-na"},
+      {mg:"Miharihary",fr:"Tousser",ph:"mi-ha-ri-HA-ri"},
+      {mg:"Tomany",fr:"Pleurer",ph:"too-MA-ni"},
+      {mg:"Tsindrin'aretina",fr:"Tension artérielle",ph:"tsin-drin-a-reh-TI-na"},
+      {mg:"Fivalanana",fr:"Selles",ph:"fi-va-la-NA-na"},
+      {mg:"Pômpy",fr:"Pharmacie",ph:"POOM-pi"},
+      {mg:"Mitsabo",fr:"Soigner / Traiter",ph:"mi-TSA-boo"},
+      {mg:"Mandeha tsara",fr:"Guérir / Aller mieux",ph:"man-DEH-ha TSA-ra"},
+      {mg:"Fitsaboana ara-ndrindra",fr:"Opération",ph:"fi-tsa-bwa-NA a-ra-drin-dra"},
+      {mg:"Rà malemy",fr:"Anémie",ph:"RA ma-LEH-mi"},
+      {mg:"Fivalanana be",fr:"Diarrhée",ph:"fi-va-la-NA-na BEH"},
+      {mg:"Kaboka",fr:"Tuberculose (terme courant)",ph:"ka-BOO-ka"},
+      {mg:"Mosary",fr:"Faim",ph:"moo-SA-ri"},
+      {mg:"Hetaheta",fr:"Soif",ph:"heh-ta-HEH-ta"},
+    ]
+  },
+  travail: {
+    label:"Travail & Économie", icon:"💼", color:"#DEB887",
+    words:[
+      {mg:"Asa",fr:"Travail / Emploi",ph:"A-sa"},
+      {mg:"Vola",fr:"Argent",ph:"VOO-la"},
+      {mg:"Vidiny",fr:"Prix",ph:"vi-DI-ni"},
+      {mg:"Mivarotra",fr:"Vendre",ph:"mi-va-ROO-tra"},
+      {mg:"Mividy",fr:"Acheter",ph:"mi-VI-di"},
+      {mg:"Tsena",fr:"Marché",ph:"TSEH-na"},
+      {mg:"Banky",fr:"Banque",ph:"BAN-ki"},
+      {mg:"Karatra",fr:"Carte",ph:"ka-RA-tra"},
+      {mg:"Karama",fr:"Salaire",ph:"ka-RA-ma"},
+      {mg:"Mpampiasa",fr:"Employeur",ph:"mpam-pi-A-sa"},
+      {mg:"Mpiasa",fr:"Employé / Travailleur",ph:"mpi-A-sa"},
+      {mg:"Tokantrano",fr:"Foyer / Ménage",ph:"too-kan-TRA-noo"},
+      {mg:"Fanjakana",fr:"Gouvernement / État",ph:"fan-ja-KA-na"},
+      {mg:"Famokarana",fr:"Production",ph:"fa-moo-ka-RA-na"},
+      {mg:"Varotra",fr:"Commerce",ph:"va-ROO-tra"},
+      {mg:"Tombon'ondana",fr:"Bénéfice",ph:"toom-boo-noo-DA-na"},
+      {mg:"Trosa",fr:"Dette",ph:"TROO-sa"},
+      {mg:"Famatsiana",fr:"Investissement",ph:"fa-mat-si-A-na"},
+      {mg:"Hofan-trano",fr:"Loyer",ph:"hoo-fan-TRA-noo"},
+      {mg:"Hetra",fr:"Taxe / Impôt",ph:"HEH-tra"},
+      {mg:"Fitaratra",fr:"Contrat",ph:"fi-ta-RA-tra"},
+      {mg:"Famoahana",fr:"Publication / Sortie",ph:"fa-mwa-HA-na"},
+      {mg:"Asa-tanana",fr:"Artisanat",ph:"a-sa-ta-NA-na"},
+      {mg:"Fambolena",fr:"Agriculture",ph:"fam-boo-LEH-na"},
+      {mg:"Fiompiana",fr:"Élevage",ph:"fi-oom-pi-A-na"},
+      {mg:"Fanafainana",fr:"Vitesse / Rapidité",ph:"fa-na-fay-NA-na"},
+      {mg:"Fandaminana",fr:"Organisation",ph:"fan-da-mi-NA-na"},
+      {mg:"Fitaovana",fr:"Équipement",ph:"fi-taw-VA-na"},
+      {mg:"Fiadanan'ny mpiasa",fr:"Syndicat",ph:"fi-a-da-nan-ni mpi-A-sa"},
+      {mg:"Tsenam-be",fr:"Supermarché",ph:"tse-nam-BEH"},
+    ]
+  },
+  ecole: {
+    label:"École & Éducation", icon:"🎓", color:"#9B59B6",
+    words:[
+      {mg:"Sekoly",fr:"École",ph:"seh-KOO-li"},
+      {mg:"Mpampianatra",fr:"Professeur",ph:"mpam-pi-a-NA-tra"},
+      {mg:"Mpianatra",fr:"Élève / Étudiant",ph:"mpi-a-NA-tra"},
+      {mg:"Boky",fr:"Livre",ph:"BOO-ki"},
+      {mg:"Penina",fr:"Stylo",ph:"peh-NI-na"},
+      {mg:"Loko",fr:"Crayon de couleur",ph:"LOO-koo"},
+      {mg:"Takila",fr:"Cahier",ph:"ta-KI-la"},
+      {mg:"Efitrano fampianarana",fr:"Salle de classe",ph:"eh-fi-TRA-noo fam-pi-a-na-RA-na"},
+      {mg:"Fampianarana",fr:"Enseignement / Leçon",ph:"fam-pi-a-na-RA-na"},
+      {mg:"Dinika",fr:"Discussion",ph:"di-NI-ka"},
+      {mg:"Fanontaniana",fr:"Question",ph:"fa-noo-ta-ni-A-na"},
+      {mg:"Valiny",fr:"Réponse",ph:"va-LI-ni"},
+      {mg:"Fanadinana",fr:"Examen",ph:"fa-na-di-NA-na"},
+      {mg:"Naoty",fr:"Note / Score",ph:"NAW-ti"},
+      {mg:"Teny",fr:"Langue / Mot",ph:"TEH-ni"},
+      {mg:"Matematika",fr:"Mathématiques",ph:"ma-teh-ma-TI-ka"},
+      {mg:"Siansa",fr:"Science",ph:"si-AN-sa"},
+      {mg:"Tantara",fr:"Histoire",ph:"tan-TA-ra"},
+      {mg:"Jeografia",fr:"Géographie",ph:"jeh-oo-gra-FI-a"},
+      {mg:"Fizika",fr:"Physique",ph:"fi-ZI-ka"},
+      {mg:"Kimia",fr:"Chimie",ph:"ki-MI-a"},
+      {mg:"Fahaizana",fr:"Compétence / Savoir",ph:"fa-hay-ZA-na"},
+      {mg:"Fahalalana",fr:"Connaissance",ph:"fa-ha-la-LA-na"},
+      {mg:"Fifanakalozan-teny",fr:"Échange linguistique",ph:"fi-fa-na-ka-loo-zan-TEH-ni"},
+      {mg:"Laminaria",fr:"Programme",ph:"la-mi-na-RI-a"},
+      {mg:"Taratasy",fr:"Papier / Lettre",ph:"ta-ra-TA-si"},
+      {mg:"Lahatsoratra",fr:"Rapport / Rédaction",ph:"la-ha-tsoo-RA-tra"},
+      {mg:"Fandaharana",fr:"Programme / Planning",ph:"fan-da-ha-RA-na"},
+      {mg:"Oniversite",fr:"Université",ph:"oo-ni-vehr-si-TEH"},
+      {mg:"Diploma",fr:"Diplôme",ph:"dip-LOO-ma"},
+    ]
+  },
+  emotions: {
+    label:"Émotions & Sentiments", icon:"😊", color:"#FF69B4",
+    words:[
+      {mg:"Faly",fr:"Heureux / Content",ph:"FA-li"},
+      {mg:"Malahelo",fr:"Triste",ph:"ma-la-HEH-loo"},
+      {mg:"Tezitra",fr:"En colère / Fâché",ph:"teh-ZI-tra"},
+      {mg:"Tahotra",fr:"Peur",ph:"ta-HOO-tra"},
+      {mg:"Hafanana",fr:"Amour / Chaleur",ph:"ha-fa-NA-na"},
+      {mg:"Fitiavana",fr:"Amour / Affection",ph:"fi-ti-a-VA-na"},
+      {mg:"Fadiranovana",fr:"Tristesse profonde",ph:"fa-di-ra-noo-VA-na"},
+      {mg:"Hafaliana",fr:"Joie",ph:"ha-fa-li-A-na"},
+      {mg:"Faniriana",fr:"Désir / Envie",ph:"fa-ni-ri-A-na"},
+      {mg:"Fanantarana",fr:"Étonnement",ph:"fa-nan-ta-RA-na"},
+      {mg:"Henatra",fr:"Honte",ph:"heh-NA-tra"},
+      {mg:"Avonavona",fr:"Fierté / Orgueil",ph:"a-voo-na-VOO-na"},
+      {mg:"Fialonana",fr:"Jalousie",ph:"fi-a-loo-NA-na"},
+      {mg:"Faniriana",fr:"Espoir",ph:"fa-ni-ri-A-na"},
+      {mg:"Fahasahiranana",fr:"Inquiétude",ph:"fa-ha-sa-hi-ra-NA-na"},
+      {mg:"Filaminana",fr:"Paix / Calme",ph:"fi-la-mi-NA-na"},
+      {mg:"Fatiguée",fr:"Fatigué(e)",ph:"fa-ti-GEH"},
+      {mg:"Mahafinaritra",fr:"Agréable / Plaisant",ph:"ma-ha-fi-na-ri-TRA"},
+      {mg:"Mahatsapa",fr:"Ressentir / Percevoir",ph:"ma-ha-TSA-pa"},
+      {mg:"Mifaly",fr:"Se réjouir",ph:"mi-FA-li"},
+      {mg:"Mitomany",fr:"Pleurer",ph:"mi-too-MA-ni"},
+      {mg:"Mihomehy",fr:"Rire",ph:"mi-hoo-MEH-hi"},
+      {mg:"Mieritreritra",fr:"Réfléchir / Penser",ph:"mi-eh-ri-treh-RI-tra"},
+      {mg:"Mahagaga",fr:"Étonnant / Surprenant",ph:"ma-ha-GA-ga"},
+      {mg:"Fahalianana",fr:"Intérêt",ph:"fa-ha-li-a-NA-na"},
+      {mg:"Sahotaka",fr:"Anxieux / Stressé",ph:"sa-hoo-TA-ka"},
+      {mg:"Fo manaintaina",fr:"Cœur brisé",ph:"FOO ma-nay-TAY-na"},
+      {mg:"Fiara-po",fr:"Satisfait",ph:"fi-a-ra-POO"},
+      {mg:"Fankasitrahana",fr:"Reconnaissance / Gratitude",ph:"fan-ka-si-tra-HA-na"},
+      {mg:"Fiheverana",fr:"Pensée / Opinion",ph:"fi-heh-veh-RA-na"},
+    ]
+  },
+  technologie: {
+    label:"Technologie & Modernité", icon:"📱", color:"#3498DB",
+    words:[
+      {mg:"Finday",fr:"Téléphone portable",ph:"FIN-day"},
+      {mg:"Solosaina",fr:"Ordinateur",ph:"soo-loo-SAY-na"},
+      {mg:"Aterineto",fr:"Internet",ph:"a-teh-ri-NEH-too"},
+      {mg:"Fampakarana",fr:"Envoi / Téléchargement",ph:"fam-pa-ka-RA-na"},
+      {mg:"Tafatafa",fr:"Message / Tchat",ph:"ta-fa-TA-fa"},
+      {mg:"Fahitalavitra",fr:"Télévision",ph:"fa-hi-ta-la-VI-tra"},
+      {mg:"Radio",fr:"Radio",ph:"RA-di-oo"},
+      {mg:"Serasera",fr:"Communication / Réseau",ph:"seh-ra-SEH-ra"},
+      {mg:"Sary",fr:"Photo / Image",ph:"SA-ri"},
+      {mg:"Horohoronteny",fr:"Vidéo / Film",ph:"hoo-roo-hoo-roon-TEH-ni"},
+      {mg:"Feo",fr:"Son / Voix",ph:"FEH-oo"},
+      {mg:"Bateria",fr:"Batterie",ph:"ba-teh-RI-a"},
+      {mg:"Jiro-ka-sola",fr:"Énergie solaire",ph:"ji-roo-ka-SOO-la"},
+      {mg:"Fampitana",fr:"Transmission / Partage",ph:"fam-pi-TA-na"},
+      {mg:"Rohy",fr:"Lien / Connexion",ph:"ROO-hi"},
+      {mg:"Kaonty",fr:"Compte (réseau social)",ph:"KWON-ti"},
+      {mg:"Teny fiambenana",fr:"Mot de passe",ph:"TEH-ni fi-am-beh-NA-na"},
+      {mg:"Fampiasana",fr:"Application / Usage",ph:"fam-pi-a-SA-na"},
+      {mg:"Fanariana",fr:"Mise à jour",ph:"fa-na-ri-A-na"},
+      {mg:"Tsy misy riry",fr:"Déconnecté / Hors ligne",ph:"tsi MI-si RI-ri"},
+      {mg:"Misy riry",fr:"Connecté / En ligne",ph:"MI-si RI-ri"},
+      {mg:"Kaompitery",fr:"Ordinateur (emprunté)",ph:"kwom-pi-teh-ri"},
+      {mg:"Printera",fr:"Imprimante",ph:"prin-TEH-ra"},
+      {mg:"Tatitra",fr:"Rapport",ph:"ta-TI-tra"},
+      {mg:"Lahatsoratra",fr:"Texte / Document",ph:"la-ha-tsoo-RA-tra"},
+      {mg:"Fandaharana",fr:"Programme / Logiciel",ph:"fan-da-ha-RA-na"},
+      {mg:"Fanadihadiana",fr:"Recherche",ph:"fa-na-di-ha-di-A-na"},
+      {mg:"Fisafoana",fr:"Navigation / Recherche",ph:"fi-sa-fwa-NA"},
+      {mg:"Kitapo-kaonty",fr:"Portefeuille numérique",ph:"ki-ta-poo-KWON-ti"},
+      {mg:"Faka-sary",fr:"Caméra / Photo",ph:"fa-ka-SA-ri"},
+    ]
+  },
+  verbes_action: {
+    label: "Verbes d'action", icon: "🏃", color: "#FF4500",
+    words: [
+      {mg:"Manao",fr:"Faire",ph:"ma-NAW"},
+      {mg:"Mandeha",fr:"Aller / Partir",ph:"man-DEH-ha"},
+      {mg:"Mihinana",fr:"Manger",ph:"mi-HI-na-na"},
+      {mg:"Misotro",fr:"Boire",ph:"mi-SOO-troo"},
+      {mg:"Matory",fr:"Dormir",ph:"ma-TOO-ri"},
+      {mg:"Mamaky",fr:"Lire",ph:"ma-MA-ki"},
+      {mg:"Manoratra",fr:"Écrire",ph:"ma-NOO-ra-tra"},
+      {mg:"Mividy",fr:"Acheter",ph:"mi-VI-di"},
+      {mg:"Mivarotra",fr:"Vendre",ph:"mi-va-ROO-tra"},
+      {mg:"Mitady",fr:"Chercher",ph:"mi-TA-di"},
+      {mg:"Mahita",fr:"Voir / Trouver",ph:"ma-HI-ta"},
+      {mg:"Mihaino",fr:"Écouter",ph:"mi-HAY-noo"},
+      {mg:"Miteny",fr:"Parler",ph:"mi-TEH-ni"},
+      {mg:"Manome",fr:"Donner",ph:"ma-NOO-meh"},
+      {mg:"Mandray",fr:"Prendre / Recevoir",ph:"man-DRAY"},
+      {mg:"Miasa",fr:"Travailler",ph:"mi-A-sa"},
+      {mg:"Milalao",fr:"Jouer",ph:"mi-la-LAW"},
+      {mg:"Mianatra",fr:"Apprendre / Étudier",ph:"mi-A-na-tra"},
+      {mg:"Mijery",fr:"Regarder",ph:"mi-JEH-ri"},
+      {mg:"Mieritreritra",fr:"Penser",ph:"mi-eh-ri-treh-RI-tra"}
+    ]
+  },
+  adjectifs_courants: {
+    label: "Adjectifs courants", icon: "✨", color: "#9370DB",
+    words: [
+      {mg:"Tsara",fr:"Bon / Bien / Beau",ph:"TSA-ra"},
+      {mg:"Ratsy",fr:"Mauvais / Laid",ph:"RA-tsi"},
+      {mg:"Lehibe",fr:"Grand (taille/importance)",ph:"leh-HI-beh"},
+      {mg:"Kely",fr:"Petit",ph:"KEH-li"},
+      {mg:"Lavitra",fr:"Loin",ph:"LA-vi-tra"},
+      {mg:"Akaiky",fr:"Proche",ph:"a-KAY-ki"},
+      {mg:"Mafana",fr:"Chaud",ph:"ma-FA-na"},
+      {mg:"Mangatsiaka",fr:"Froid",ph:"man-ga-tsi-A-ka"},
+      {mg:"Lafo",fr:"Cher (prix)",ph:"LA-foo"},
+      {mg:"Mora",fr:"Facile / Bon marché",ph:"MOO-ra"},
+      {mg:"Sarotra",fr:"Difficile",ph:"SA-roo-tra"},
+      {mg:"Vaovao",fr:"Nouveau",ph:"vaw-VAW"},
+      {mg:"Antitra",fr:"Vieux",ph:"AN-ti-tra"},
+      {mg:"Madio",fr:"Propre",ph:"ma-DI-oo"},
+      {mg:"Maloto",fr:"Sale",ph:"ma-LOO-too"},
+      {mg:"Fohy",fr:"Court",ph:"FOO-hi"},
+      {mg:"Lava",fr:"Long / Grand",ph:"LA-va"},
+      {mg:"Hafa",fr:"Autre / Différent",ph:"HA-fa"},
+      {mg:"Marina",fr:"Vrai / Juste",ph:"ma-RI-na"},
+      {mg:"Diso",fr:"Faux",ph:"DI-soo"}
+    ]
+  },
+  survie_urgences: {
+    label: "Survie & Urgences", icon: "🆘", color: "#DC143C",
+    words: [
+      {mg:"Ampio aho!",fr:"Aidez-moi !",ph:"am-PI-oo a-oo"},
+      {mg:"Vonjeo!",fr:"Au secours !",ph:"voon-JEH-oo"},
+      {mg:"Aiza ny efitrano fivoahana?",fr:"Où sont les toilettes ?",ph:"AY-za ni eh-fi-TRA-noo fi-vwa-HA-na"},
+      {mg:"Mila dokotera aho",fr:"J'ai besoin d'un médecin",ph:"MI-la doo-koo-TEH-ra a-oo"},
+      {mg:"Tsy azoko",fr:"Je ne comprends pas",ph:"tsi a-ZOO-koo"},
+      {mg:"Avereno azafady",fr:"Répétez s'il vous plaît",ph:"a-veh-REH-noo a-za-FA-di"},
+      {mg:"Tsy miteny malagasy aho",fr:"Je ne parle pas malgache",ph:"tsi mi-TEH-ni ma-la-GA-si a-oo"},
+      {mg:"Miteny frantsay ve ianao?",fr:"Parlez-vous français ?",ph:"mi-TEH-ni fran-TSAY veh ya-NAW"},
+      {mg:"Very aho",fr:"Je suis perdu(e)",ph:"VEH-ri a-oo"},
+      {mg:"Mila fanampiana aho",fr:"J'ai besoin d'aide",ph:"MI-la fa-nam-pi-A-na a-oo"}
+    ]
+  }
+};
+
+const GRAMMAR_LESSONS = [
+  {id:"vos",title:"Structure VOS",icon:"📐",color:"#FF6B6B",
+   content:[
+     {type:"text",text:"Le malgache suit l'ordre **Verbe – Objet – Sujet (VOS)**, à l'opposé du français."},
+     {type:"example",mg:"Mamaky boky ny mpianatra",fr:"L'étudiant lit des livres",note:"Lit livre(s) l'étudiant"},
+     {type:"text",text:"Le sujet vient toujours **en fin de phrase**. C'est la particularité la plus importante !"},
+     {type:"example",mg:"Manasa lamba izy",fr:"Il lave des vêtements",note:"Lave vêtements il"},
+   ],tip:"Pense toujours à l'envers : action → objet → qui fait l'action."},
+  {id:"focus",title:"Système de Focus (Voice)",icon:"🎯",color:"#4ECDC4",
+   content:[
+     {type:"text",text:"Le malgache utilise un système de **focus** unique qui change la terminaison du verbe."},
+     {type:"example",mg:"Manasa lamba izy",fr:"Il lave des vêtements",note:"Actor Focus (sujet actif)"},
+     {type:"example",mg:"Sasan'ny zaza ny lamba",fr:"Les vêtements sont lavés par l'enfant",note:"Goal Focus (objet en avant)"},
+     {type:"text",text:"Ce système **remplace la voix passive** du français de manière plus riche."},
+   ],tip:"Le focus détermine quelle information est mise en avant dans la phrase."},
+  {id:"prefix",title:"Préfixes verbaux",icon:"🔧",color:"#FFD93D",
+   content:[
+     {type:"text",text:"Les verbes malgaches utilisent des préfixes pour indiquer le sens :"},
+     {type:"bullet",items:["**ma-** : action active → Mandeha (marcher)","**mi-** : action réfléchie → Mihinana (manger)","**man-** : transitif actif → Manoratra (écrire)","**mp-** : agent → Mpampianatra (enseignant)"]},
+   ],tip:"Les préfixes ma-, mi-, man- sont les plus fréquents au quotidien."},
+  {id:"tenses",title:"Les temps (m→n→h)",icon:"⏰",color:"#A8E6CF",
+   content:[
+     {type:"text",text:"Le temps se marque par un simple changement de **première lettre** :"},
+     {type:"bullet",items:["**Présent** : m- → Mandeha (il marche)","**Passé** : n- → Nandeha (il a marché)","**Futur** : h- → Handeha (il marchera)"]},
+     {type:"example",mg:"Nihinana izy",fr:"Il a mangé",note:"n- = passé de mihinana"},
+     {type:"example",mg:"Hihinana izy",fr:"Il mangera",note:"h- = futur de mihinana"},
+   ],tip:"m→n pour le passé, m→h pour le futur. Très régulier !"},
+  {id:"pronouns",title:"Pronoms personnels",icon:"👤",color:"#C3B1E1",
+   content:[
+     {type:"text",text:"Le malgache distingue deux formes de **nous** :"},
+     {type:"bullet",items:["**Aho** → Je","**Isika** → Nous (toi et moi inclus)","**Izahay** → Nous (sans l'interlocuteur)","**Ianao / Hianao** → Tu","**Izy** → Il / Elle","**Izy ireo** → Ils / Elles"]},
+   ],tip:"Isika inclut l'interlocuteur, Izahay l'exclut — une distinction unique !"},
+  {id:"negation",title:"La négation",icon:"🚫",color:"#FFB347",
+   content:[
+     {type:"text",text:"La négation se forme avec **tsy** placé avant le verbe ou l'adjectif :"},
+     {type:"example",mg:"Tsy mandeha aho",fr:"Je ne marche pas",note:"tsy + verbe"},
+     {type:"example",mg:"Tsy tsara izy",fr:"Il n'est pas bien",note:"tsy + adjectif"},
+     {type:"text",text:"**Tsy** est invariable et s'utilise dans tous les contextes."},
+   ],tip:"Tsy devant le verbe = négation. Pas de double négation !"},
+  {id:"articles",title:"Articles et déterminants",icon:"📖",color:"#6BCB77",
+   content:[
+     {type:"text",text:"Le malgache utilise **ny** comme article défini (le/la/les) :"},
+     {type:"example",mg:"ny boky",fr:"le livre",note:"article défini"},
+     {type:"example",mg:"ny zaza",fr:"l'enfant / les enfants",note:"pluriel non marqué"},
+     {type:"text",text:"Il n'y a pas d'article indéfini (un/une). Ni de genre grammatical !"},
+   ],tip:"Ny = le/la/les/l' — un seul article pour tout !"},
+  {id:"possession",title:"La possession",icon:"🤝",color:"#FF69B4",
+   content:[
+     {type:"text",text:"La possession s'exprime avec **ny + nom + possessif** ou par suffixes :"},
+     {type:"bullet",items:["**-ko** → mon/ma → boky**ko** (mon livre)","**-nao** → ton/ta → boky**nao** (ton livre)","**-ny** → son/sa → boky**ny** (son livre)","**-ntsika** → notre → boky**ntsika**","**-nareo** → votre → boky**nareo**","**-n'izy ireo** → leur → livre d'eux"]},
+   ],tip:"Les suffixes de possession s'ajoutent directement au nom !"},
+  {
+    id: "conj_imperatif", title: "Conjugaison : L'Impératif", icon: "❗️", color: "#FF4500",
+    content: [
+      {type: "text", text: "L'impératif sert à donner un ordre ou un conseil. Pour le former, on ajoute généralement le suffixe **-a** ou **-o** à la racine du verbe, et on décale l'accent tonique."},
+      {type: "example", mg: "Mandeha (Aller) → Mandehà!", fr: "Va ! / Allez !", note: "L'accent tonique passe sur la dernière syllabe."},
+      {type: "example", mg: "Mijery (Regarder) → Mijere!", fr: "Regarde ! / Regardez !", note: "Le 'y' final devient souvent 'e'."},
+      {type: "example", mg: "Mihinana (Manger) → Mihinàna!", fr: "Mange ! / Mangez !", note: ""}
+    ],
+    tip: "À l'écrit, l'accent grave sur la dernière voyelle (ex: -à) indique souvent un impératif."
+  },
+  {
+    id: "gram_pluriel", title: "Le pluriel des noms", icon: "👥", color: "#9370DB",
+    content: [
+      {type: "text", text: "Excellente nouvelle : les noms et les adjectifs malgaches sont **invariables** ! Il n'y a pas de 's' à ajouter à la fin des mots."},
+      {type: "text", text: "Le pluriel se devine par le contexte, ou s'indique avec des mots spécifiques comme **ireo** (ces / ceux-là) ou **maro** (beaucoup)."},
+      {type: "example", mg: "Ny boky", fr: "Le livre / Les livres", note: "Aucun changement sur le mot."},
+      {type: "example", mg: "Ireo boky ireo", fr: "Ces livres-là", note: "Utilisation de 'ireo' pour forcer le pluriel."},
+      {type: "example", mg: "Olona maro", fr: "Beaucoup de personnes", note: "Maro indique la pluralité."}
+    ],
+    tip: "Si tu n'es pas sûr, laisse le mot au singulier, le contexte fera le reste !"
+  },
+  {
+    id: "gram_adjectifs", title: "La place de l'adjectif", icon: "🎨", color: "#20B2AA",
+    content: [
+      {type: "text", text: "Contrairement au français où l'adjectif peut être avant ou après le nom, en malgache, l'adjectif se place **toujours après le nom** qu'il qualifie."},
+      {type: "example", mg: "Trano lehibe", fr: "Une grande maison", note: "Littéralement : Maison grande"},
+      {type: "example", mg: "Saka mainty", fr: "Un chat noir", note: "Littéralement : Chat noir"},
+      {type: "text", text: "Si tu veux dire 'La maison est grande', l'adjectif passe **au début** de la phrase :"},
+      {type: "example", mg: "Lehibe ny trano", fr: "La maison est grande", note: "Littéralement : Grande [est] la maison"}
+    ],
+    tip: "Attribut (Le chat est noir) = Adjectif + Nom. Épithète (Le chat noir) = Nom + Adjectif."
+  }
+];
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+const S = {
+  page: 'home',
+  subPage: null,
+  activeTheme: null,
+  activeLesson: null,
+  // Flashcard state
+  fc: { words: [], idx: 0, flipped: false, showPhonetic: false, known: [], unknown: [], done: false },
+  // Exercise state
+  ex: { started: false, difficulty: 1, themeFilter: 'all', questions: [], qIdx: 0, selected: null, score: 0, done: false, aiLoading: false },
+  // Grammar
+  gr: { selectedLesson: null },
+  // Persistent (localStorage)
+  xp: parseInt(ls('mg_xp') || '0'),
+  streak: parseInt(ls('mg_streak') || '1'),
+  completed: JSON.parse(ls('mg_comp') || '{}'),
+  showInstall: ls('mg_install_dismissed') !== '1',
+};
+
+function ls(k, v) {
+  if (v === undefined) return localStorage.getItem(k);
+  localStorage.setItem(k, v);
+}
+function save() {
+  ls('mg_xp', S.xp);
+  ls('mg_comp', JSON.stringify(S.completed));
+}
+function addXp(n) { S.xp += n; save(); }
+function markDone(id) { S.completed[id] = true; save(); }
+
+const LEVEL = () => Math.floor(S.xp / 100) + 1;
+const XP_IN_LEVEL = () => S.xp % 100;
+const TOTAL_DONE = () => Object.keys(S.completed).length;
+
+// ═══════════════════════════════════════════════════════════
+// SHUFFLE
+// ═══════════════════════════════════════════════════════════
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function navigate(page) {
+  S.page = page;
+  S.subPage = null;
+  S.activeTheme = null;
+  S.gr.selectedLesson = null;
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const nb = document.getElementById('nav-' + page);
+  if (nb) nb.classList.add('active');
+  render();
+  document.getElementById('main-screen').scrollTop = 0;
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER ENGINE
+// ═══════════════════════════════════════════════════════════
+function render() {
+  const el = document.getElementById('main-screen');
+  const navEl = document.getElementById('nav');
+  // Hide nav on sub-pages
+  const hideNav = ['flashcard', 'lesson-detail', 'exercise-run', 'exercise-result'].includes(S.subPage);
+  navEl.style.display = hideNav ? 'none' : 'flex';
+  el.style.paddingBottom = hideNav ? '20px' : '';
+
+  if (S.page === 'home') el.innerHTML = renderHome();
+  else if (S.page === 'vocab' && !S.subPage) el.innerHTML = renderVocab();
+  else if (S.subPage === 'flashcard') el.innerHTML = renderFlashcard();
+  else if (S.page === 'grammar' && !S.subPage) el.innerHTML = renderGrammar();
+  else if (S.subPage === 'lesson-detail') el.innerHTML = renderLessonDetail();
+  else if (S.page === 'exercise' && !S.subPage) el.innerHTML = renderExerciseSetup();
+  else if (S.subPage === 'exercise-run') el.innerHTML = renderExerciseRun();
+  else if (S.subPage === 'exercise-result') el.innerHTML = renderExerciseResult();
+}
+
+// ═══════════════════════════════════════════════════════════
+// HOME
+// ═══════════════════════════════════════════════════════════
+function renderHome() {
+  const totalWords = Object.values(THEMES).reduce((a, t) => a + t.words.length, 0);
+  const install = S.showInstall ? `
+    <div class="install-banner">
+      <div style="font-size:28px">📲</div>
+      <div class="install-text">
+        <div class="install-title">Installer sur iPhone</div>
+        <div class="install-sub">Safari → Partager → Sur l'écran d'accueil</div>
+      </div>
+      <button class="install-close" onclick="dismissInstall()">✕</button>
+    </div>` : '';
+
+  return `
+    <div class="hero">
+      <div class="hero-top">
+        <div class="hero-flag">🇲🇬</div>
+        <div>
+          <div class="hero-title">Malgache</div>
+          <div class="hero-sub">Langue de Madagascar</div>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-val" style="color:#FFD93D">⚡ ${LEVEL()}</div>
+          <div class="stat-lbl">Niveau</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val" style="color:#FF6B6B">🔥 ${S.streak}</div>
+          <div class="stat-lbl">Jours</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val" style="color:#4ECDC4">${TOTAL_DONE()}</div>
+          <div class="stat-lbl">Appris</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val" style="color:#6BCB77">${totalWords}</div>
+          <div class="stat-lbl">Mots</div>
+        </div>
+      </div>
+      <div class="xp-label">XP : ${XP_IN_LEVEL()}/100 → Niveau ${LEVEL() + 1}</div>
+      <div class="xp-track"><div class="xp-fill" style="width:${XP_IN_LEVEL()}%"></div></div>
+    </div>
+    ${install}
+    <div class="menu-grid">
+      <button class="menu-card" onclick="navigate('vocab')" style="border-top:4px solid #FF6B6B">
+        <span class="menu-card-icon">📚</span>
+        <span class="menu-card-title" style="color:#FF6B6B">Vocabulaire</span>
+        <span class="menu-card-desc">${Object.keys(THEMES).length} thèmes • ${totalWords} mots</span>
+      </button>
+      <button class="menu-card" onclick="navigate('grammar')" style="border-top:4px solid #4ECDC4">
+        <span class="menu-card-icon">📝</span>
+        <span class="menu-card-title" style="color:#4ECDC4">Grammaire</span>
+        <span class="menu-card-desc">${GRAMMAR_LESSONS.length} leçons</span>
+      </button>
+      <button class="menu-card" onclick="navigate('exercise')" style="border-top:4px solid #FFD93D">
+        <span class="menu-card-icon">💪</span>
+        <span class="menu-card-title" style="color:#FFD93D">Exercices</span>
+        <span class="menu-card-desc">QCM + IA illimités</span>
+      </button>
+      <button class="menu-card" onclick="navigate('vocab')" style="border-top:4px solid #6BCB77">
+        <span class="menu-card-icon">🎯</span>
+        <span class="menu-card-title" style="color:#6BCB77">Progression</span>
+        <span class="menu-card-desc">${Math.round((TOTAL_DONE()/totalWords)*100)}% maîtrisé</span>
+      </button>
+    </div>
+    <div class="tip-box">
+      <span style="font-size:20px">💡</span>
+      <p class="tip-text">Le malgache est une langue austronésienne. Malgré sa localisation en Afrique, elle est plus proche du malais et de l'indonésien que des langues africaines !</p>
+    </div>
+  `;
+}
+function dismissInstall() { S.showInstall = false; ls('mg_install_dismissed', '1'); render(); }
+
+// ═══════════════════════════════════════════════════════════
+// VOCAB
+// ═══════════════════════════════════════════════════════════
+function renderVocab() {
+  const totalWords = Object.values(THEMES).reduce((a, t) => a + t.words.length, 0);
+  const cards = Object.entries(THEMES).map(([key, th]) => {
+    const done = th.words.filter((_, i) => S.completed[`v_${key}_${i}`]).length;
+    const pct = Math.round((done / th.words.length) * 100);
+    return `
+      <button class="theme-card" onclick="openFlashcard('${key}')">
+        <span class="theme-card-icon">${th.icon}</span>
+        <div class="theme-card-info">
+          <div class="theme-card-title" style="color:${th.color}">${th.label}</div>
+          <div class="theme-card-sub">${done}/${th.words.length} mots • ${pct}%</div>
+        </div>
+        ${done === th.words.length ? '<span class="done-check">✅</span>' : `<span style="color:${th.color};font-weight:800">${pct}%</span>`}
+        <div class="theme-progress-mini"><div class="theme-progress-fill" style="width:${pct}%;background:${th.color}"></div></div>
+      </button>`;
+  }).join('');
+
+  return `
+    <div class="page-header">
+      <div class="page-title">📚 Vocabulaire</div>
+      <div class="page-sub">${Object.keys(THEMES).length} thèmes • ${totalWords} mots au total</div>
+    </div>
+    <div class="theme-list">${cards}</div>
+  `;
+}
+
+function openFlashcard(themeKey) {
+  const th = THEMES[themeKey];
+  const words = shuffle(th.words.map((w, i) => ({ ...w, origIdx: i })));
+  S.activeTheme = themeKey;
+  S.fc = { words, idx: 0, flipped: false, showPhonetic: false, known: [], unknown: [], done: false };
+  S.subPage = 'flashcard';
+  render();
+}
+
+// ═══════════════════════════════════════════════════════════
+// FLASHCARD
+// ═══════════════════════════════════════════════════════════
+function renderFlashcard() {
+  const th = THEMES[S.activeTheme];
+  const fc = S.fc;
+
+  if (fc.done) {
+    return `
+      <div class="result">
+        <div class="result-emoji">${fc.known.length >= fc.words.length * 0.8 ? '🏆' : '📚'}</div>
+        <h2 class="result-title">Session terminée !</h2>
+        <div class="result-score">${fc.known.length}/${fc.words.length}</div>
+        <p style="color:#4ECDC4;font-weight:700">✅ ${fc.known.length} mots sus</p>
+        <p style="color:#FF6B6B;font-weight:700">❌ ${fc.unknown.length} à revoir</p>
+        <p class="result-xp">+${fc.known.length * 5} XP gagnés !</p>
+        <div class="btn-row">
+          <button class="btn-secondary" onclick="openFlashcard('${S.activeTheme}')">🔄 Rejouer</button>
+          <button class="btn-primary" onclick="navigate('vocab')" style="flex:1.5">Retour</button>
+        </div>
+      </div>`;
+  }
+
+  const word = fc.words[fc.idx];
+  const isDone = S.completed[`v_${S.activeTheme}_${word.origIdx}`];
+  const pct = Math.round(((fc.idx + 1) / fc.words.length) * 100);
+
+  return `
+    <div class="back-bar">
+      <button class="back-btn" onclick="navigate('vocab')">← Vocabulaire</button>
+      <span class="back-title">${th.icon} ${th.label}</span>
+      ${isDone ? '<span class="back-badge">✅ Appris</span>' : ''}
+    </div>
+    <div class="fc-meta">
+      <span>${fc.idx + 1}/${fc.words.length}</span>
+      <div class="fc-track"><div class="fc-fill" style="width:${pct}%;background:${th.color}"></div></div>
+      <span style="color:${th.color}">${pct}%</span>
+    </div>
+
+    <div class="card-wrap" onclick="fcFlip()">
+      <div class="card" style="border-top-color:${th.color}">
+        ${!fc.flipped ? `
+          <div class="card-lang">🇲🇬 Malgache</div>
+          <div class="card-word">${word.mg}</div>
+          ${fc.showPhonetic ? `<div class="card-phonetic">/${word.ph}/</div>` : ''}
+          <div class="card-hint">👆 Appuie pour révéler</div>
+        ` : `
+          <div class="card-lang">🇫🇷 Français</div>
+          <div class="card-word">${word.fr}</div>
+          <div class="card-translation">${word.mg}</div>
+          <div class="card-phonetic">/${word.ph}/</div>
+        `}
+      </div>
+    </div>
+
+    <button class="phonetic-btn" onclick="fcTogglePhonetic()">
+      ${fc.showPhonetic ? '🔇 Cacher prononciation' : '🔊 Voir prononciation'}
+    </button>
+
+    ${fc.flipped ? `
+      <div class="fc-actions">
+        <button class="fc-btn fc-btn-bad" onclick="fcAnswer(false)">❌ À revoir</button>
+        <button class="fc-btn fc-btn-good" onclick="fcAnswer(true)">✅ Je sais !</button>
+      </div>
+    ` : ''}
+  `;
+}
+
+function fcFlip() { S.fc.flipped = !S.fc.flipped; render(); }
+function fcTogglePhonetic() { S.fc.showPhonetic = !S.fc.showPhonetic; render(); }
+function fcAnswer(wasKnown) {
+  const fc = S.fc;
+  const word = fc.words[fc.idx];
+  if (wasKnown) {
+    markDone(`v_${S.activeTheme}_${word.origIdx}`);
+    addXp(5);
+    fc.known.push(fc.idx);
+  } else {
+    fc.unknown.push(fc.idx);
+  }
+  fc.flipped = false;
+  fc.showPhonetic = false;
+  if (fc.idx + 1 >= fc.words.length) fc.done = true;
+  else fc.idx++;
+  render();
+}
+
+// ═══════════════════════════════════════════════════════════
+// GRAMMAR
+// ═══════════════════════════════════════════════════════════
+function renderGrammar() {
+  const rows = GRAMMAR_LESSONS.map(l => {
+    const done = S.completed[`g_${l.id}`];
+    return `
+      <button class="lesson-row" onclick="openLesson('${l.id}')" style="border-left:5px solid ${l.color}">
+        <span style="font-size:24px">${l.icon}</span>
+        <div style="flex:1">
+          <div class="lesson-title" style="color:${l.color}">${l.title}</div>
+          <div class="lesson-xp">+15 XP</div>
+        </div>
+        <span style="font-size:18px">${done ? '✅' : '▶️'}</span>
+      </button>`;
+  }).join('');
+
+  return `
+    <div class="page-header">
+      <div class="page-title">📝 Grammaire</div>
+      <div class="page-sub">Maîtrisez les structures du malgache</div>
+    </div>
+    <div class="lesson-list">${rows}</div>
+  `;
+}
+
+function openLesson(id) {
+  S.gr.selectedLesson = id;
+  S.subPage = 'lesson-detail';
+  render();
+}
+
+function renderLessonDetail() {
+  const l = GRAMMAR_LESSONS.find(x => x.id === S.gr.selectedLesson);
+  const done = S.completed[`g_${l.id}`];
+
+  const contentHtml = l.content.map(c => {
+    if (c.type === 'text') {
+      const html = c.text.replace(/\*\*(.+?)\*\*/g, '<strong class="highlight">$1</strong>');
+      return `<p>${html}</p>`;
+    }
+    if (c.type === 'example') {
+      return `<div style="background:var(--surf2);border-radius:12px;padding:12px;margin:8px 0">
+        <div style="font-size:18px;font-weight:800;color:var(--accent)">${c.mg}</div>
+        <div style="color:var(--text);margin:4px 0">${c.fr}</div>
+        ${c.note ? `<div style="color:var(--muted);font-size:12px;font-style:italic">${c.note}</div>` : ''}
+      </div>`;
+    }
+    if (c.type === 'bullet') {
+      return c.items.map(it => {
+        const html = it.replace(/\*\*(.+?)\*\*/g, '<strong class="highlight">$1</strong>');
+        return `<div class="bullet"><span style="color:${l.color}">→</span><span>${html}</span></div>`;
+      }).join('');
+    }
+    return '';
+  }).join('');
+
+  return `
+    <div class="back-bar">
+      <button class="back-btn" onclick="navigate('grammar')">← Grammaire</button>
+      <span class="back-title">${l.icon} ${l.title}</span>
+    </div>
+    <div class="lesson-content" style="border-top:4px solid ${l.color}">
+      ${contentHtml}
+      <div class="lesson-tip" style="background:${l.color}18;border:1px solid ${l.color}40">
+        <span style="font-size:20px">💡</span>
+        <p class="lesson-tip-text" style="color:${l.color}">${l.tip}</p>
+      </div>
+      ${!done ? `
+        <button class="btn-primary" style="margin-top:16px;background:${l.color}" onclick="completeLesson('${l.id}')">
+          ✅ Leçon apprise ! (+15 XP)
+        </button>` : `
+        <div style="text-align:center;color:#4ECDC4;font-weight:800;margin-top:16px">✅ Leçon complétée !</div>`}
+    </div>
+  `;
+}
+
+function completeLesson(id) {
+  markDone(`g_${id}`);
+  addXp(15);
+  render();
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXERCISE SETUP
+// ═══════════════════════════════════════════════════════════
+function renderExerciseSetup() {
+  const themeOptions = `<option value="all">Tous les thèmes</option>` +
+    Object.entries(THEMES).map(([k, t]) => `<option value="${k}">${t.icon} ${t.label}</option>`).join('');
+
+  return `
+    <div class="page-header">
+      <div class="page-title">💪 Exercices</div>
+      <div class="page-sub">QCM classiques + génération IA illimitée</div>
+    </div>
+
+    <div class="ai-box">
+      <div class="ai-title">🤖 Exercices générés par IA</div>
+      <div class="ai-sub">Génère autant d'exercices que tu veux sur n'importe quel thème</div>
+      <div class="ai-controls">
+        <select class="ai-select" id="ai-theme">${themeOptions}</select>
+        <select class="ai-select" id="ai-type">
+          <option value="mixed">Types mixtes</option>
+          <option value="mg_to_fr">🇲🇬 → 🇫🇷</option>
+          <option value="fr_to_mg">🇫🇷 → 🇲🇬</option>
+          <option value="grammar">Grammaire</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:10px">
+        <select class="ai-select" id="ai-count">
+          <option value="5">5 questions</option>
+          <option value="10" selected>10 questions</option>
+          <option value="20">20 questions</option>
+        </select>
+        <button class="btn-primary" style="flex:1" onclick="startAiExercise()">🚀 Générer !</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:15px;font-weight:800;margin-bottom:10px">Niveau de difficulté :</div>
+      <div class="diff-grid">
+        ${[1,2,3].map(d => `
+          <button class="diff-btn ${S.ex.difficulty === d ? 'selected' : ''}" onclick="setDiff(${d})">
+            <span style="font-size:22px">${['🌱','🌿','🌳'][d-1]}</span>
+            <div class="diff-info">
+              <span>${['Débutant','Intermédiaire','Avancé'][d-1]}</span>
+              <span class="diff-sub">${['Vocabulaire de base','Vocab + grammaire','Tout + expressions'][d-1]}</span>
+            </div>
+          </button>`).join('')}
+      </div>
+    </div>
+    <button class="btn-primary" onclick="startClassicExercise()">▶️ Exercice classique</button>
+  `;
+}
+
+function setDiff(d) { S.ex.difficulty = d; render(); }
+
+// Build classic questions from vocab
+function buildClassicQuestions(diff) {
+  const allWords = [];
+  Object.entries(THEMES).forEach(([key, th]) => {
+    th.words.forEach((w, i) => allWords.push({ ...w, themeKey: key, themeLabel: th.label, origIdx: i }));
+  });
+  const pool = shuffle(allWords).slice(0, diff * 30);
+  const questions = [];
+
+  pool.forEach(word => {
+    // mg→fr
+    const wrongsMgFr = shuffle(pool.filter(w => w.fr !== word.fr)).slice(0, 3).map(w => w.fr);
+    if (wrongsMgFr.length === 3) {
+      questions.push({
+        type: 'mg_to_fr', q: `Que signifie "${word.mg}" ?`,
+        answer: word.fr, theme: word.themeLabel,
+        choices: shuffle([word.fr, ...wrongsMgFr])
+      });
+    }
+    // fr→mg
+    const wrongsFrMg = shuffle(pool.filter(w => w.mg !== word.mg)).slice(0, 3).map(w => w.mg);
+    if (wrongsFrMg.length === 3) {
+      questions.push({
+        type: 'fr_to_mg', q: `Comment dit-on "${word.fr}" en malgache ?`,
+        answer: word.mg, theme: word.themeLabel,
+        choices: shuffle([word.mg, ...wrongsFrMg])
+      });
+    }
+  });
+
+  return shuffle(questions).slice(0, 10);
+}
+
+function startClassicExercise() {
+  const qs = buildClassicQuestions(S.ex.difficulty);
+  S.ex = { ...S.ex, started: true, questions: qs, qIdx: 0, selected: null, score: 0, done: false, aiLoading: false };
+  S.subPage = 'exercise-run';
+  render();
+}
+
+// ═══════════════════════════════════════════════════════════
+// AI EXERCISE
+// ═══════════════════════════════════════════════════════════
+async function startAiExercise() {
+  const themeKey = document.getElementById('ai-theme').value;
+  const exType = document.getElementById('ai-type').value;
+  const count = parseInt(document.getElementById('ai-count').value);
+  const th = themeKey === 'all' ? null : THEMES[themeKey];
+
+  // Build context
+  let vocabContext = '';
+  if (th) {
+    vocabContext = th.words.slice(0, 20).map(w => `${w.mg} = ${w.fr}`).join(', ');
+  } else {
+    Object.entries(THEMES).slice(0, 5).forEach(([k, t]) => {
+      vocabContext += t.label + ': ' + t.words.slice(0, 5).map(w => `${w.mg}=${w.fr}`).join(', ') + '. ';
+    });
+  }
+
+  const typeInstr = {
+    mixed: 'Mix de questions malgache→français, français→malgache et grammaire.',
+    mg_to_fr: 'Uniquement questions "Que signifie X en malgache ?" avec réponse en français.',
+    fr_to_mg: 'Uniquement questions "Comment dit-on X en malgache ?".',
+    grammar: 'Uniquement questions sur la grammaire malgache (ordre des mots, temps, négation, pronoms, etc.).',
+  }[exType];
+
+  const prompt = `Tu es un expert en langue malgache. Génère exactement ${count} questions QCM pour apprendre le malgache.
+
+Vocabulaire de référence: ${vocabContext}
+${th ? `Thème: ${th.label}` : 'Tous les thèmes'}
+Type: ${typeInstr}
+
+Réponds UNIQUEMENT en JSON valide, sans markdown, ce format exact:
+{"questions":[{"q":"question","answer":"réponse correcte","choices":["A","B","C","D"],"theme":"thème","type":"mg_to_fr"}]}
+
+Règles:
+- choices doit avoir EXACTEMENT 4 éléments dont answer
+- Mets answer à une position aléatoire dans choices
+- Les mauvaises réponses doivent être plausibles
+- Thèmes variés si pas de filtre
+- Questions progressives`;
+
+  // Show loading
+  S.subPage = 'exercise-run';
+  S.ex.aiLoading = true;
+  S.ex.questions = [];
+  render();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content.map(c => c.text || '').join('');
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    const questions = parsed.questions || [];
+
+    S.ex = { ...S.ex, aiLoading: false, questions, qIdx: 0, selected: null, score: 0, done: false };
+    render();
+  } catch (e) {
+    // Fallback to classic
+    S.ex.aiLoading = false;
+    const qs = buildClassicQuestions(2);
+    S.ex = { ...S.ex, questions: qs, qIdx: 0, selected: null, score: 0, done: false };
+    render();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXERCISE RUN
+// ═══════════════════════════════════════════════════════════
+function renderExerciseRun() {
+  if (S.ex.aiLoading) {
+    return `
+      <div class="back-bar">
+        <button class="back-btn" onclick="navigate('exercise')">← Exercices</button>
+        <span class="back-title">Génération IA…</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:60vh;gap:16px">
+        <div style="font-size:48px">🤖</div>
+        <p style="color:var(--muted)">L'IA génère vos exercices…</p>
+        <div class="loading-dots">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+      </div>`;
+  }
+
+  if (S.ex.done) return renderExerciseResult();
+
+  const q = S.ex.questions[S.ex.qIdx];
+  if (!q) return renderExerciseResult();
+  const pct = Math.round((S.ex.qIdx / S.ex.questions.length) * 100);
+
+  return `
+    <div class="back-bar">
+      <button class="back-btn" onclick="navigate('exercise')">← Exercices</button>
+      <span class="back-title">Q${S.ex.qIdx+1}/${S.ex.questions.length}</span>
+      <span class="back-badge" style="color:#FFD93D">⭐ ${S.ex.score * 10} XP</span>
+    </div>
+    <div class="ex-progress"><div class="ex-fill" style="width:${pct}%"></div></div>
+
+    <div class="q-card">
+      <div class="q-theme">📌 ${q.theme || 'Vocabulaire'}</div>
+      <h2 class="q-text">${q.q}</h2>
+    </div>
+
+    <div class="choices">
+      ${(q.choices || []).map(c => {
+        let cls = 'choice';
+        if (S.ex.selected !== null) {
+          if (c === q.answer) cls += ' correct';
+          else if (c === S.ex.selected) cls += ' wrong';
+        }
+        return `<button class="${cls}" onclick="answerEx('${escHtml(c)}')" ${S.ex.selected ? 'disabled' : ''}>${c}</button>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+function escHtml(s) { return s.replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
+function answerEx(choice) {
+  if (S.ex.selected !== null) return;
+  const q = S.ex.questions[S.ex.qIdx];
+  S.ex.selected = choice;
+  if (choice === q.answer) { S.ex.score++; addXp(10); }
+  render();
+  setTimeout(() => {
+    if (S.ex.qIdx + 1 >= S.ex.questions.length) {
+      S.ex.done = true;
+    } else {
+      S.ex.qIdx++;
+      S.ex.selected = null;
+    }
+    render();
+  }, 1100);
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXERCISE RESULT
+// ═══════════════════════════════════════════════════════════
+function renderExerciseResult() {
+  const { score, questions } = S.ex;
+  const total = questions.length;
+  const pct = Math.round((score / total) * 100);
+  const emoji = pct >= 80 ? '🏆' : pct >= 60 ? '😊' : '📚';
+  const msg = pct === 100 ? 'Parfait ! 🎉' : pct >= 80 ? 'Excellent résultat ! 💪' : pct >= 60 ? 'Bon travail, continue ! 🌿' : 'Continue à pratiquer ! 🌱';
+
+  return `
+    <div class="result">
+      <div class="result-emoji">${emoji}</div>
+      <h2 class="result-title">Quiz terminé !</h2>
+      <div class="result-score">${score}/${total}</div>
+      <p class="result-xp">+${score * 10} XP gagnés !</p>
+      <p class="result-msg">${msg}</p>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="navigate('exercise')">Reconfigurer</button>
+        <button class="btn-primary" onclick="startClassicExercise()">🔄 Rejouer</button>
+      </div>
+      <button class="btn-primary" style="margin-top:8px;background:var(--teal)" onclick="startAiExerciseAgain()">🤖 Nouveaux avec IA</button>
+    </div>`;
+}
+
+function startAiExerciseAgain() {
+  S.subPage = null;
+  navigate('exercise');
+}
+
+// ═══════════════════════════════════════════════════════════
+// PWA / SERVICE WORKER
+// ═══════════════════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+render();
+</script>
 </body>
 </html>
